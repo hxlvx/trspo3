@@ -12,6 +12,9 @@ lock = threading.Lock()
 def calculate_collatz_steps(number):
     """
     Обчислює кількість кроків для досягнення 1 за гіпотезою Коллатца.
+
+    :param number: Число, для якого обчислюється кількість кроків.
+    :return: Кількість кроків для досягнення 1.
     """
     steps = 0
     while number != 1:
@@ -23,6 +26,8 @@ def calculate_collatz_steps(number):
 def process_number(number):
     """
     Обробляє одне число: обчислює кроки, оновлює глобальні змінні.
+
+    :param number: Число для обробки.
     """
     global total_steps, processed_count, max_steps, max_number
     steps = calculate_collatz_steps(number)
@@ -39,6 +44,10 @@ def process_number(number):
 def collatz_with_threadpool(numbers, num_threads):
     """
     Запускає обчислення для чисел з використанням ThreadPoolExecutor.
+
+    :param numbers: Кількість чисел для обробки.
+    :param num_threads: Кількість потоків для виконання паралельних завдань.
+    :return: Середня кількість кроків, найбільша кількість кроків і число з найбільшими кроками.
     """
     global total_steps, processed_count, max_steps, max_number
 
@@ -47,6 +56,9 @@ def collatz_with_threadpool(numbers, num_threads):
     processed_count = 0
     max_steps = 0
     max_number = 0
+
+    if numbers <= 0 or num_threads <= 0:
+        raise ValueError("Кількість чисел і кількість потоків мають бути додатними числами.")
 
     with concurrent.futures.ThreadPoolExecutor(max_workers=num_threads) as executor:
         # Додаємо завдання в пул потоків
@@ -64,6 +76,9 @@ if __name__ == "__main__":
 
     for thread_count in THREAD_COUNTS:
         print(f"\nЗапуск з {thread_count} потоками...")
-        average_steps, max_steps, max_number = collatz_with_threadpool(NUMBERS, thread_count)
-        print(f"Середня кількість кроків: {average_steps:.2f}")
-        print(f"Найбільше число: {max_number} з {max_steps} кроками")
+        try:
+            average_steps, max_steps, max_number = collatz_with_threadpool(NUMBERS, thread_count)
+            print(f"Середня кількість кроків: {average_steps:.2f}")
+            print(f"Найбільше число: {max_number} з {max_steps} кроками")
+        except ValueError as e:
+            print(f"Помилка: {e}")
